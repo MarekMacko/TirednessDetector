@@ -9,6 +9,8 @@ public:
 	void run(void);
 
 private:
+	void setInfoToFrame(cv::Mat &frame);
+
 	cv::VideoCapture videoCapture;
 	cv::Mat frame;
 	cv::CascadeClassifier faceCascade;
@@ -20,6 +22,9 @@ private:
 
 	vector<cv::Rect> rightEyesRects;
 	vector<cv::Rect> leftEyesRects;
+
+	int blinksCounter = 0;
+	clock_t startTime;
 
 	const string MAIN_WINDOW_NAME = "Main window";
 	const string CASCADE_FACE_FILE = "C:/Libraries/opencv/sources/data/haarcascades_cuda/haarcascade_frontalface_default.xml";

@@ -1,15 +1,12 @@
 #include "stdafx.h"
 
-FaceDetect::FaceDetect()
-{
+FaceDetect::FaceDetect() {
 }
 
-FaceDetect::~FaceDetect()
-{
+FaceDetect::~FaceDetect() {
 }
 
-int FaceDetect::initialize(void)
-{
+int FaceDetect::initialize(void) {
 	if (!videoCapture.open(0)) {
 		cerr << "Error: VideoCapture open!" << endl;
 		return -1;
@@ -47,6 +44,7 @@ void FaceDetect::run(void) {
 	}
 
 	cv::Mat frameGray;
+	startTime = clock();
 	while (1) {
 		videoCapture >> frame;
 
@@ -81,9 +79,9 @@ void FaceDetect::run(void) {
 
 			if (rightEyesOpen.size() > 0 || leftEyesOpen.size() > 0) {
 				cout << "Eyes are open";
-			}
-			else {
-				cout << "Eyes are close";
+			} else {
+				blinksCounter++;
+				cout << "Eyes are close " << blinksCounter;
 			}
 
 			cout << endl;
@@ -98,10 +96,55 @@ void FaceDetect::run(void) {
 			cv::imshow("right", rightSideFace);
 		}
 
+
+
+		setInfoToFrame(frame);
 		cv::imshow(MAIN_WINDOW_NAME, frame);
+
 
 		if (cv::waitKey(1) == 27) {
 			break;
 		}
 	}
+}
+
+void FaceDetect::setInfoToFrame(cv::Mat &frame) {
+	cv::Scalar textColor(0, 0, 255);
+	int fontFace = cv::FONT_HERSHEY_COMPLEX_SMALL;
+	double fontScale = 1;
+	int thickness = 1;
+
+	cv::putText(frame, 
+		"Total closed: " + to_string(blinksCounter),
+		cv::Point(10, 20),
+		fontFace,
+		fontScale,
+		textColor,
+		thickness,
+		CV_AA);
+
+	float elapsedSeconds = (clock() - startTime) / CLOCKS_PER_SEC;
+
+	cv::putText(frame,
+		"Total time elapsed: " + to_string(elapsedSeconds),
+		cv::Point(10, 40),
+		fontFace,
+		fontScale,
+		textColor,
+		thickness,
+		CV_AA);
+
+	float blinksForMinute = 0;
+	if (elapsedSeconds > 0) {
+		blinksForMinute = blinksCounter / elapsedSeconds * 60.f;
+	}
+
+	cv::putText(frame,
+		"Blink for minute: " + to_string(blinksForMinute),
+		cv::Point(10, 60),
+		fontFace,
+		fontScale,
+		textColor,
+		thickness,
+		CV_AA);
 }
