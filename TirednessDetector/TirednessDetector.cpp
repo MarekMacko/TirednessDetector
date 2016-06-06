@@ -6,5 +6,3 @@ int main() {
 	faceDetect->run();
 	free(faceDetect);
 }
-
-
